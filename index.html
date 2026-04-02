@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32 Live Data</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 50px;
+      background: #f4f6f8;
+    }
+    .card {
+      background: white;
+      display: inline-block;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 { margin-bottom: 20px; }
+    .value { font-size: 2rem; margin: 10px; }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>ESP32 Live Data</h1>
+  <div class="value">🌡 Temperature: <span id="temp">--</span> °C</div>
+  <div class="value">💧 Humidity: <span id="hum">--</span> %</div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYST43AYX7CUw102kI4erNUME-EWam01E",
+    authDomain: "esp32-lora-monitor-3d346.firebaseapp.com",
+    databaseURL: "https://esp32-lora-monitor-3d346-default-rtdb.firebaseio.com",
+    projectId: "esp32-lora-monitor-3d346",
+    storageBucket: "esp32-lora-monitor-3d346.appspot.com",
+    messagingSenderId: "902021373213",
+    appId: "1:902021373213:web:0d317c72399c7475b795f4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const dataRef = ref(db, "sensorData");
+
+  onValue(dataRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById("temp").textContent = data.temperature;
+      document.getElementById("hum").textContent = data.humidity;
+    }
+  });
+</script>
+
+</body>
+</html>
