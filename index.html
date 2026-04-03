@@ -3,22 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>ESP32 Live Data</title>
+
   <style>
     body {
       font-family: Arial;
       text-align: center;
-      margin-top: 50px;
+      margin-top: 40px;
       background: #f4f6f8;
     }
+
     .card {
       background: white;
       display: inline-block;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
     }
+
     h1 { margin-bottom: 20px; }
-    .value { font-size: 2rem; margin: 10px; }
+
+    .value {
+      font-size: 1.3rem;
+      margin: 10px;
+    }
+
+    .status-auto {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-manual {
+      color: orange;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -26,8 +44,15 @@
 
 <div class="card">
   <h1>ESP32 Live Data</h1>
-  <div class="value">🌡 Temperature: <span id="temp">--</span> °C</div>
-  <div class="value">💧 Humidity: <span id="hum">--</span> %</div>
+
+  <div class="value">🌱 Top Soil: <span id="topsoil">--</span></div>
+  <div class="value">🌿 Bottom Soil: <span id="bottomsoil">--</span></div>
+  <div class="value">📡 RSSI: <span id="rssi">--</span> dBm</div>
+  <div class="value">🕒 Time: <span id="time">--</span></div>
+
+  <div class="value">
+    ⚙️ Mode: <span id="mode">--</span>
+  </div>
 </div>
 
 <script type="module">
@@ -35,7 +60,7 @@
   import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDYST43AYX7CUw102kI4erNUME-EWam01E",
+    apiKey: "YOUR_API_KEY",
     authDomain: "esp32-lora-monitor-3d346.firebaseapp.com",
     databaseURL: "https://esp32-lora-monitor-3d346-default-rtdb.firebaseio.com",
     projectId: "esp32-lora-monitor-3d346",
@@ -51,9 +76,22 @@
 
   onValue(dataRef, (snapshot) => {
     const data = snapshot.val();
+
     if (data) {
-      document.getElementById("temp").textContent = data.temperature;
-      document.getElementById("hum").textContent = data.humidity;
+      document.getElementById("topsoil").textContent = data.topsoil_vwc;
+      document.getElementById("bottomsoil").textContent = data.bottomsoil_vwc;
+      document.getElementById("rssi").textContent = data.rssi;
+      document.getElementById("time").textContent = data.timestamp;
+
+      const modeElement = document.getElementById("mode");
+
+      if (data.ondemand === true) {
+        modeElement.textContent = "Requested Reading";
+        modeElement.className = "status-manual";
+      } else {
+        modeElement.textContent = "Automatic";
+        modeElement.className = "status-auto";
+      }
     }
   });
 </script>
